@@ -120,7 +120,6 @@ class NoticiaTile extends StatefulWidget {
   @override
   _NoticiaTileState createState() => _NoticiaTileState();
 }
-
 class _NoticiaTileState extends State<NoticiaTile> {
   bool _expanded = false;
 
@@ -191,15 +190,14 @@ class _NoticiaTileState extends State<NoticiaTile> {
                   ),
                 ),
                 SizedBox(height: 5),
-                ListView.builder(
-                  shrinkWrap: true,
-                  itemCount: widget.evento.descricao.length,
-                  itemBuilder: (context, index) {
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: widget.evento.descricao.map((descricao) {
                     return Text(
-                      widget.evento.descricao[index],
+                      descricao,
                       style: TextStyle(fontSize: widget.fontSize),
                     );
-                  },
+                  }).toList(),
                 ),
               ],
             ),
