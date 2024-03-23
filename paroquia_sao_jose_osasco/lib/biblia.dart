@@ -163,7 +163,7 @@ class _BibliaPageState extends State<BibliaPage> {
     return Container(
       margin: EdgeInsets.symmetric(vertical: 4.0, horizontal: 8.0),
       decoration: BoxDecoration(
-        color: Color.fromARGB(255, 212, 235, 255),
+        color: Color.fromARGB(255, 202, 227, 249),
         borderRadius: BorderRadius.circular(8.0),
         boxShadow: [
           BoxShadow(
@@ -244,14 +244,20 @@ class _BibliaPageState extends State<BibliaPage> {
 }
 
 
+
 class ChapterPage extends StatefulWidget {
   final String fileName;
   final String content;
   final String livro;
   final int grade;
 
-  const ChapterPage({Key? key, required this.fileName, required this.content, required this.livro, required this.grade})
-      : super(key: key);
+  const ChapterPage({
+    Key? key,
+    required this.fileName,
+    required this.content,
+    required this.livro,
+    required this.grade,
+  }) : super(key: key);
 
   @override
   _ChapterPageState createState() => _ChapterPageState();
@@ -260,10 +266,19 @@ class ChapterPage extends StatefulWidget {
 class _ChapterPageState extends State<ChapterPage> {
   double _fontSize = 16.0;
   List<dynamic> comments = [];
+  late String _fileName;
+  late String _content;
+  late String _livro;
+  late int _grade;
+  final _scrollController = ScrollController();
 
   @override
   void initState() {
     super.initState();
+    _fileName = widget.fileName;
+    _content = widget.content;
+    _livro = widget.livro;
+    _grade = widget.grade;
     loadComments();
   }
 
@@ -274,7 +289,7 @@ class _ChapterPageState extends State<ChapterPage> {
     if (await file.exists()) {
       List<dynamic> allComments = json.decode(await file.readAsString());
       setState(() {
-        comments = allComments.where((comment) => comment['livro'] == widget.livro && comment['grade'] == widget.grade).toList();
+        comments = allComments.where((comment) => comment['livro'] == _livro && comment['grade'] == _grade).toList();
       });
     }
   }
@@ -296,10 +311,10 @@ class _ChapterPageState extends State<ChapterPage> {
   void _saveComment(String comentario) async {
     if (comentario.isNotEmpty) {
       final Map<String, dynamic> commentMap = {
-        "fileName": widget.fileName,
-        "content": widget.content,
-        "livro": widget.livro,
-        "grade": widget.grade,
+        "fileName": _fileName,
+        "content": _content,
+        "livro": _livro,
+        "grade": _grade,
         "comentario": comentario,
       };
 
@@ -339,11 +354,40 @@ class _ChapterPageState extends State<ChapterPage> {
     loadComments();
   }
 
+  void _loadChapterText(int chapter) async {
+    String nextFileName = 'assets/biblia/Testamentos/${_livro}_$chapter.txt';
+    String nextContent = await rootBundle.loadString(nextFileName);
+    String nextChapterName = "${_livro.capitalize()} $chapter";
+
+    setState(() {
+      _fileName = nextChapterName;
+      _content = nextContent;
+      _grade = chapter;
+    });
+
+    loadComments();
+
+    // Scroll to top
+    _scrollController.animateTo(
+      0.0,
+      duration: Duration(milliseconds: 500),
+      curve: Curves.easeInOut,
+    );
+  }
+
+  void _scrollToTop() {
+    _scrollController.animateTo(
+      0.0,
+      duration: Duration(milliseconds: 500),
+      curve: Curves.easeInOut,
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(widget.fileName),
+        title: Text(_fileName),
         actions: [
           IconButton(
             icon: Icon(Icons.zoom_in),
@@ -352,6 +396,20 @@ class _ChapterPageState extends State<ChapterPage> {
           IconButton(
             icon: Icon(Icons.zoom_out),
             onPressed: _decreaseFontSize,
+          ),
+          IconButton(
+            icon: Icon(Icons.arrow_back),
+            onPressed: _grade > 1 ? () {
+              _loadChapterText(_grade - 1);
+              _scrollToTop();
+            } : null,
+          ),
+          IconButton(
+            icon: Icon(Icons.arrow_forward),
+            onPressed: () {
+              _loadChapterText(_grade + 1);
+              _scrollToTop();
+            },
           ),
           IconButton(
             icon: Icon(Icons.comment),
@@ -392,6 +450,7 @@ class _ChapterPageState extends State<ChapterPage> {
         ],
       ),
       body: SingleChildScrollView(
+        controller: _scrollController,
         padding: EdgeInsets.all(16.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -411,7 +470,7 @@ class _ChapterPageState extends State<ChapterPage> {
                 ],
               ),
               child: Text(
-                widget.content,
+                _content,
                 style: TextStyle(fontSize: _fontSize),
               ),
             ),
@@ -469,7 +528,6 @@ class _ChapterPageState extends State<ChapterPage> {
     );
   }
 }
-
 
 extension StringExtension on String {
   String capitalize() {

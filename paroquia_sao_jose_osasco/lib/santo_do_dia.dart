@@ -12,11 +12,13 @@ class _SantoDoDiaPageState extends State<SantoDoDiaPage> {
   String _santoDoDiaText = 'Carregando...';
   Image? _santoDoDiaImage;
   double _fontSize = 16.0;
+  late DateTime _selectedDate;
 
   @override
   void initState() {
     super.initState();
-    _loadSantoDoDiaContent(DateTime.now());
+    _selectedDate = DateTime.now();
+    _loadSantoDoDiaContent(_selectedDate);
   }
 
   Future<void> _loadSantoDoDiaContent(DateTime selectedDate) async {
@@ -44,14 +46,31 @@ class _SantoDoDiaPageState extends State<SantoDoDiaPage> {
     }
   }
 
+  void _navigateToPreviousDay() {
+    setState(() {
+      _selectedDate = _selectedDate.subtract(Duration(days: 1));
+    });
+    _loadSantoDoDiaContent(_selectedDate);
+  }
+
+  void _navigateToNextDay() {
+    setState(() {
+      _selectedDate = _selectedDate.add(Duration(days: 1));
+    });
+    _loadSantoDoDiaContent(_selectedDate);
+  }
+
   Future<void> _selectDate(BuildContext context) async {
     final DateTime? picked = await showDatePicker(
       context: context,
-      initialDate: DateTime.now(),
+      initialDate: _selectedDate,
       firstDate: DateTime(1900),
       lastDate: DateTime(2100),
     );
     if (picked != null) {
+      setState(() {
+        _selectedDate = picked;
+      });
       _loadSantoDoDiaContent(picked);
     }
   }
@@ -98,11 +117,29 @@ class _SantoDoDiaPageState extends State<SantoDoDiaPage> {
               mainAxisAlignment: MainAxisAlignment.center,
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    IconButton(
+                      icon: Icon(Icons.arrow_back),
+                      color: Color.fromARGB(255, 255, 255, 255),
+                      onPressed: _navigateToPreviousDay,
+                    ),
+                    Text(
+                      '${_selectedDate.day}/${_selectedDate.month}/${_selectedDate.year}',
+                      style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                    ),
+                    IconButton(
+                      icon: Icon(Icons.arrow_forward),
+                      color: Color.fromARGB(255, 255, 255, 255),
+                      onPressed: _navigateToNextDay,
+                    ),
+                  ],
+                ),
                 if (_santoDoDiaImage != null)
                   Container(
-                    width: 600,
-                    height: 600,
-
+                    width: 500,
+                    height: 500,
                     child: ClipRRect(
                       borderRadius: BorderRadius.circular(8),
                       child: _santoDoDiaImage!,

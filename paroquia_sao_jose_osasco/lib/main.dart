@@ -144,12 +144,19 @@ class ContactInfo extends StatelessWidget {
           onTap: () {
             launch("tel://1132912400"); // Abre o aplicativo de telefone com o número específico
           },
-          child: Text(
-            "Telefone: (11) 3686-8961",
-            style: TextStyle(
-              color: Colors.blue,
-              decoration: TextDecoration.underline,
-            ),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Icon(Icons.phone, color: const Color.fromARGB(255, 248, 252, 255)),
+              SizedBox(width: 5),
+              Text(
+                "Telefone: (11) 3686-8961",
+                style: TextStyle(
+                  color: const Color.fromARGB(255, 248, 252, 255),
+                  decoration: TextDecoration.underline,
+                ),
+              ),
+            ],
           ),
         ),
         SizedBox(height: 10),
@@ -157,15 +164,23 @@ class ContactInfo extends StatelessWidget {
           onTap: () {
             launch("https://maps.app.goo.gl/m9qhWyEBwzbJWFqf6"); // Abre o endereço no Google Maps
           },
-          child: Text('''
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Icon(Icons.location_on, color: const Color.fromARGB(255, 246, 251, 255)),
+              SizedBox(width: 5),
+              Text('''
 Paróquia São José
-Rua Francisco Haro Alaminos, 80 – Vila São José – CEP: 06290-050 – Osasco / SP
+Rua Francisco Haro Alaminos, 80 
+Vila São José – CEP: 06290-050 – Osasco / SP
 ''',
-            style: TextStyle(
-              color: Colors.blue,
-              decoration: TextDecoration.underline,
-            ),
-            textAlign: TextAlign.center,
+                style: TextStyle(
+                  color: const Color.fromARGB(255, 246, 251, 255),
+                  decoration: TextDecoration.underline,
+                ),
+                textAlign: TextAlign.center,
+              ),
+            ],
           ),
         ),
       ],
