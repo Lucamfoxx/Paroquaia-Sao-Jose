@@ -1,6 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart' show rootBundle;
 
+class SantoDoDia {
+  final String text;
+  final Image? image;
+
+  SantoDoDia({required this.text, this.image});
+}
+
 class SantoDoDiaPage extends StatefulWidget {
   const SantoDoDiaPage({Key? key}) : super(key: key);
 
@@ -9,10 +16,10 @@ class SantoDoDiaPage extends StatefulWidget {
 }
 
 class _SantoDoDiaPageState extends State<SantoDoDiaPage> {
-  String _santoDoDiaText = 'Carregando...';
-  Image? _santoDoDiaImage;
+  late SantoDoDia _santoDoDia;
   double _fontSize = 16.0;
   late DateTime _selectedDate;
+  bool _isLoading = false;
 
   @override
   void initState() {
@@ -22,6 +29,10 @@ class _SantoDoDiaPageState extends State<SantoDoDiaPage> {
   }
 
   Future<void> _loadSantoDoDiaContent(DateTime selectedDate) async {
+    setState(() {
+      _isLoading = true;
+    });
+
     try {
       String formattedDate =
           "${selectedDate.day.toString().padLeft(2, '0')}_${selectedDate.month.toString().padLeft(2, '0')}";
@@ -29,19 +40,22 @@ class _SantoDoDiaPageState extends State<SantoDoDiaPage> {
       String santoDoDiaText =
           await rootBundle.loadString('assets/santo_dia/txt/$formattedDate.txt');
 
+      Image? santoDoDiaImage;
       bool imageExists = await rootBundle
           .load('assets/santo_dia/jpg/$formattedDate.jpg')
-          .then((value) => true)
-          .catchError((error) => false);
+          .then((value) {
+        santoDoDiaImage = Image.asset('assets/santo_dia/jpg/$formattedDate.jpg');
+        return true;
+      }).catchError((error) => false);
 
       setState(() {
-        _santoDoDiaText = santoDoDiaText;
-        _santoDoDiaImage = imageExists ? Image.asset('assets/santo_dia/jpg/$formattedDate.jpg') : null;
+        _santoDoDia = SantoDoDia(text: santoDoDiaText, image: imageExists ? santoDoDiaImage : null);
+        _isLoading = false;
       });
     } catch (e) {
       setState(() {
-        _santoDoDiaText = 'Erro ao carregar o conteúdo.';
-        _santoDoDiaImage = null;
+        _santoDoDia = SantoDoDia(text: 'Erro ao carregar o conteúdo.');
+        _isLoading = false;
       });
     }
   }
@@ -109,62 +123,64 @@ class _SantoDoDiaPageState extends State<SantoDoDiaPage> {
           ),
         ],
       ),
-      body: SingleChildScrollView(
-        child: Center(
-          child: Padding(
-            padding: const EdgeInsets.all(16.0),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: [
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    IconButton(
-                      icon: Icon(Icons.arrow_back),
-                      color: Color.fromARGB(255, 255, 255, 255),
-                      onPressed: _navigateToPreviousDay,
-                    ),
-                    Text(
-                      '${_selectedDate.day}/${_selectedDate.month}/${_selectedDate.year}',
-                      style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-                    ),
-                    IconButton(
-                      icon: Icon(Icons.arrow_forward),
-                      color: Color.fromARGB(255, 255, 255, 255),
-                      onPressed: _navigateToNextDay,
-                    ),
-                  ],
+      body: _isLoading
+          ? Center(child: CircularProgressIndicator())
+          : SingleChildScrollView(
+              child: Center(
+                child: Padding(
+                  padding: const EdgeInsets.all(16.0),
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          IconButton(
+                            icon: Icon(Icons.arrow_back),
+                            color: Color.fromARGB(255, 255, 255, 255),
+                            onPressed: _navigateToPreviousDay,
+                          ),
+                          Text(
+                            '${_selectedDate.day}/${_selectedDate.month}/${_selectedDate.year}',
+                            style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                          ),
+                          IconButton(
+                            icon: Icon(Icons.arrow_forward),
+                            color: Color.fromARGB(255, 255, 255, 255),
+                            onPressed: _navigateToNextDay,
+                          ),
+                        ],
+                      ),
+                      if (_santoDoDia.image != null)
+                        Container(
+                          width: 500,
+                          height: 500,
+                          child: ClipRRect(
+                            borderRadius: BorderRadius.circular(8),
+                            child: _santoDoDia.image!,
+                          ),
+                        ),
+                      const SizedBox(height: 20),
+                      Container(
+                        padding: const EdgeInsets.all(16),
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                        child: SingleChildScrollView(
+                          child: Text(
+                            _santoDoDia.text,
+                            textAlign: TextAlign.justify,
+                            style: TextStyle(fontSize: _fontSize),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
-                if (_santoDoDiaImage != null)
-                  Container(
-                    width: 500,
-                    height: 500,
-                    child: ClipRRect(
-                      borderRadius: BorderRadius.circular(8),
-                      child: _santoDoDiaImage!,
-                    ),
-                  ),
-                const SizedBox(height: 20),
-                Container(
-                  padding: const EdgeInsets.all(16),
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.circular(10),
-                  ),
-                  child: SingleChildScrollView(
-                    child: Text(
-                      _santoDoDiaText,
-                      textAlign: TextAlign.justify,
-                      style: TextStyle(fontSize: _fontSize),
-                    ),
-                  ),
-                ),
-              ],
+              ),
             ),
-          ),
-        ),
-      ),
     );
   }
 }
