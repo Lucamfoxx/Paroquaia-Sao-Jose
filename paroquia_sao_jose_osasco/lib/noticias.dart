@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_database/firebase_database.dart';
-import 'package:intl/intl.dart'; 
+import 'package:intl/intl.dart';
 
 class Evento {
   final String titulo;
@@ -8,14 +8,19 @@ class Evento {
   final DateTime dataInicio;
   final DateTime dataFim;
 
-  Evento({required this.titulo, required this.descricao, required this.dataInicio, required this.dataFim});
+  Evento({
+    required this.titulo,
+    required this.descricao,
+    required this.dataInicio,
+    required this.dataFim,
+  });
 
   factory Evento.fromSnapshot(DataSnapshot snapshot) {
     return Evento(
-      titulo: snapshot.child('titulo').value as String,
-      descricao: (snapshot.child('descricao').value as String).split('\n'),
-      dataInicio: DateTime.parse(snapshot.child('data_inicio').value as String),
-      dataFim: DateTime.parse(snapshot.child('data_fim').value as String),
+      titulo: snapshot.child('titulo').value != null ? snapshot.child('titulo').value as String : '',
+      descricao: snapshot.child('descricao').value != null ? (snapshot.child('descricao').value as String).split('\n') : [],
+      dataInicio: snapshot.child('data_inicio').value != null ? DateTime.parse(snapshot.child('data_inicio').value as String) : DateTime.now(),
+      dataFim: snapshot.child('data_fim').value != null ? DateTime.parse(snapshot.child('data_fim').value as String) : DateTime.now(),
     );
   }
 
@@ -96,7 +101,7 @@ class _NoticiasPageState extends State<NoticiasPage> {
                 itemCount: eventos.length,
                 itemBuilder: (context, index) {
                   Evento evento = eventos[index];
-                  return NoticiaTile(evento: evento, fontSize: _fontSize);
+                  return EventoTile(evento: evento, fontSize: _fontSize);
                 },
               );
             } else {
@@ -111,72 +116,61 @@ class _NoticiasPageState extends State<NoticiasPage> {
   }
 }
 
-class NoticiaTile extends StatefulWidget {
+class EventoTile extends StatefulWidget {
   final Evento evento;
   final double fontSize;
 
-  const NoticiaTile({Key? key, required this.evento, required this.fontSize}) : super(key: key);
+  const EventoTile({Key? key, required this.evento, required this.fontSize}) : super(key: key);
 
   @override
-  _NoticiaTileState createState() => _NoticiaTileState();
+  _EventoTileState createState() => _EventoTileState();
 }
-class _NoticiaTileState extends State<NoticiaTile> {
+
+class _EventoTileState extends State<EventoTile> {
   bool _expanded = false;
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.stretch,
-      children: [
-        GestureDetector(
-          onTap: () {
-            setState(() {
-              _expanded = !_expanded;
-            });
-          },
-          child: Container(
-            margin: EdgeInsets.all(10),
-            padding: EdgeInsets.all(10),
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(15),
-              color: Colors.white,
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.grey.withOpacity(0.5),
-                  spreadRadius: 2,
-                  blurRadius: 3,
-                  offset: Offset(0, 1),
-                ),
-              ],
-            ),
-            child: Text(
-              widget.evento.titulo,
-              style: TextStyle(
-                fontSize: widget.fontSize,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 10.0),
+      child: GestureDetector(
+        onTap: () {
+          setState(() {
+            _expanded = !_expanded;
+          });
+        },
+        child: AnimatedContainer(
+          duration: Duration(milliseconds: 300),
+          curve: Curves.easeInOut,
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(20),
+            color: _expanded ? Colors.blue[100] : Colors.grey[200],
           ),
-        ),
-        if (_expanded) ...[
-          Container(
-            margin: EdgeInsets.all(10),
-            padding: EdgeInsets.all(10),
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(15),
-              color: Colors.white,
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.grey.withOpacity(0.5),
-                  spreadRadius: 2,
-                  blurRadius: 3,
-                  offset: Offset(0, 1),
-                ),
-              ],
-            ),
+          child: Padding(
+            padding: const EdgeInsets.all(20.0),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
+                Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Expanded( // Adicionado Expanded
+                        child: Text(
+                          widget.evento.titulo,
+                          style: TextStyle(
+                            fontSize: 20,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ),
+                      Icon(
+                        _expanded ? Icons.keyboard_arrow_up : Icons.keyboard_arrow_down,
+                        size: 30,
+                      ),
+                    ],
+                  ),
+         
+                SizedBox(height: 10),
                 Text(
                   'Início: ${DateFormat('dd/MM/yyyy').format(widget.evento.dataInicio)}',
                   style: TextStyle(
@@ -189,21 +183,23 @@ class _NoticiaTileState extends State<NoticiaTile> {
                     fontStyle: FontStyle.italic,
                   ),
                 ),
-                SizedBox(height: 5),
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: widget.evento.descricao.map((descricao) {
-                    return Text(
-                      descricao,
-                      style: TextStyle(fontSize: widget.fontSize),
-                    );
-                  }).toList(),
-                ),
+                if (_expanded) ...[
+                  SizedBox(height: 10),
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: widget.evento.descricao.map((descricao) {
+                      return Text(
+                        descricao,
+                        style: TextStyle(fontSize: widget.fontSize),
+                      );
+                    }).toList(),
+                  ),
+                ],
               ],
             ),
           ),
-        ],
-      ],
+        ),
+      ),
     );
   }
 }
