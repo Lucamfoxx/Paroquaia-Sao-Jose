@@ -1,81 +1,56 @@
 import 'dart:convert';
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart' show rootBundle;
-import 'dart:io';
 import 'package:path_provider/path_provider.dart';
 
-class BibliaPage extends StatefulWidget {
-  const BibliaPage({Key? key}) : super(key: key);
+void main() {
+  runApp(MaterialApp(
+    home: BibliaPage(),
+  ));
+}
 
+class BibliaPage extends StatefulWidget {
   @override
   _BibliaPageState createState() => _BibliaPageState();
 }
 
 class _BibliaPageState extends State<BibliaPage> {
-  bool _velhoTestamentoExpanded = false;
-  bool _novoTestamentoExpanded = false;
-
-  Map<String, int> limitesGrade = {};
-  Map<String, String> menuTitles = {};
-  Map<String, int> limitesGradeNovo = {};
-  Map<String, String> menuNovo = {};
+  late bool _velhoTestamentoExpanded;
+  late bool _novoTestamentoExpanded;
+  late Map<String, int> limitesGrade;
+  late Map<String, String> menuTitles;
+  late Map<String, int> limitesGradeNovo;
+  late Map<String, String> menuNovo;
 
   @override
   void initState() {
     super.initState();
-    carregarDadosDosJSON();
+    _velhoTestamentoExpanded = false;
+    _novoTestamentoExpanded = false;
+    _loadData();
   }
 
-  Future<void> carregarDadosDosJSON() async {
-    final limitesGradeJsonString =
-        await rootBundle.loadString('assets/mapas/limites_grade.json');
-    final menuTitlesJsonString =
-        await rootBundle.loadString('assets/mapas/menu_titles.json');
-    final limitesGradeNovoJsonString =
-        await rootBundle.loadString('assets/mapas/limites_grade_novo.json');
-    final menuNovoJsonString =
-        await rootBundle.loadString('assets/mapas/menu_novo.json');
+  Future<void> _loadData() async {
+    final limitesGradeJsonString = await rootBundle.loadString('assets/mapas/limites_grade.json');
+    final menuTitlesJsonString = await rootBundle.loadString('assets/mapas/menu_titles.json');
+    final limitesGradeNovoJsonString = await rootBundle.loadString('assets/mapas/limites_grade_novo.json');
+    final menuNovoJsonString = await rootBundle.loadString('assets/mapas/menu_novo.json');
 
     setState(() {
-      Map<String, dynamic> limitesGradeJson = json.decode(limitesGradeJsonString);
-      limitesGrade = limitesGradeJson.map((key, value) => MapEntry(key, value as int));
-
-      Map<String, dynamic> menuTitlesJson = json.decode(menuTitlesJsonString);
-      menuTitles = menuTitlesJson.map((key, value) => MapEntry(key, value as String));
-
-      Map<String, dynamic> limitesGradeNovoJson = json.decode(limitesGradeNovoJsonString);
-      limitesGradeNovo = limitesGradeNovoJson.map((key, value) => MapEntry(key, value as int));
-
-      Map<String, dynamic> menuNovoJson = json.decode(menuNovoJsonString);
-      menuNovo = menuNovoJson.map((key, value) => MapEntry(key, value as String));
+      limitesGrade = Map<String, int>.from(json.decode(limitesGradeJsonString));
+      menuTitles = Map<String, String>.from(json.decode(menuTitlesJsonString));
+      limitesGradeNovo = Map<String, int>.from(json.decode(limitesGradeNovoJsonString));
+      menuNovo = Map<String, String>.from(json.decode(menuNovoJsonString));
     });
-  }
-
-  void _saveComment(String livro, int grade, String comentario) async {
-    Map<String, dynamic> commentMap = {
-      "livro": livro,
-      "grade": grade,
-      "comentario": comentario,
-    };
-
-    Directory directory = await getApplicationDocumentsDirectory();
-    File file = File('${directory.path}/comments.json');
-
-    if (!await file.exists()) {
-      await file.create();
-      await file.writeAsString(json.encode([commentMap]));
-    } else {
-      List<dynamic> comments = json.decode(await file.readAsString());
-      comments.add(commentMap);
-      await file.writeAsString(json.encode(comments));
-    }
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Bíblia'),
+        title: Text('Bíblia'),
       ),
       body: SingleChildScrollView(
         child: Column(
@@ -91,7 +66,7 @@ class _BibliaPageState extends State<BibliaPage> {
                     color: Colors.grey.withOpacity(0.5),
                     spreadRadius: 2,
                     blurRadius: 5,
-                    offset: Offset(0, 2), // Altera a posição da sombra
+                    offset: Offset(0, 2),
                   ),
                 ],
               ),
@@ -99,7 +74,7 @@ class _BibliaPageState extends State<BibliaPage> {
                 onTap: () {
                   setState(() {
                     _velhoTestamentoExpanded = !_velhoTestamentoExpanded;
-                    _novoTestamentoExpanded = false; // Fecha o Novo Testamento
+                    _novoTestamentoExpanded = false;
                   });
                 },
                 child: Padding(
@@ -127,7 +102,7 @@ class _BibliaPageState extends State<BibliaPage> {
                     color: Colors.grey.withOpacity(0.5),
                     spreadRadius: 2,
                     blurRadius: 5,
-                    offset: Offset(0, 2), // Altera a posição da sombra
+                    offset: Offset(0, 2),
                   ),
                 ],
               ),
@@ -135,14 +110,14 @@ class _BibliaPageState extends State<BibliaPage> {
                 onTap: () {
                   setState(() {
                     _novoTestamentoExpanded = !_novoTestamentoExpanded;
-                    _velhoTestamentoExpanded = false; // Fecha o Velho Testamento
+                    _velhoTestamentoExpanded = false;
                   });
                 },
                 child: Padding(
                   padding: const EdgeInsets.all(12.0),
                   child: Text(
                     'Novo Testamento',
-                    style: TextStyle(fontSize: 16.0, fontWeight: FontWeight.bold,),
+                    style: TextStyle(fontSize: 16.0, fontWeight: FontWeight.bold),
                   ),
                 ),
               ),
@@ -170,7 +145,7 @@ class _BibliaPageState extends State<BibliaPage> {
             color: Colors.grey.withOpacity(0.5),
             spreadRadius: 2,
             blurRadius: 5,
-            offset: Offset(0, 2), // changes position of shadow
+            offset: Offset(0, 2),
           ),
         ],
       ),
@@ -182,6 +157,7 @@ class _BibliaPageState extends State<BibliaPage> {
       ),
     );
   }
+
   void _openBook(String livro, Map<String, int> limites, Map<String, String> menu) {
     int limiteGrade = limites[livro] ?? 1;
     showDialog(
@@ -195,9 +171,9 @@ class _BibliaPageState extends State<BibliaPage> {
             child: GridView.builder(
               gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
                 crossAxisCount: 5,
-                mainAxisSpacing: 5.0, // aumentando o espaço entre os quadrados
-                crossAxisSpacing: 5.0, // aumentando o espaço entre os quadrados
-                childAspectRatio: 1, // alterando o aspect ratio para tornar os quadrados um pouco maiores
+                mainAxisSpacing: 5.0,
+                crossAxisSpacing: 5.0,
+                childAspectRatio: 1,
               ),
               itemCount: limiteGrade,
               itemBuilder: (BuildContext context, int index) {
@@ -214,7 +190,7 @@ class _BibliaPageState extends State<BibliaPage> {
                         style: TextStyle(
                           color: const Color.fromARGB(255, 0, 0, 0),
                           fontSize: 20.0,
-                          fontWeight: FontWeight.bold, // alterando o tamanho da fonte dos números
+                          fontWeight: FontWeight.bold,
                         ),
                       ),
                     ),
@@ -227,7 +203,6 @@ class _BibliaPageState extends State<BibliaPage> {
       },
     );
   }
-
 
   void _openChapter(String livro, int grade) async {
     String fileName = 'assets/biblia/Testamentos/${livro}_${grade}.txt';
@@ -242,8 +217,6 @@ class _BibliaPageState extends State<BibliaPage> {
     );
   }
 }
-
-
 
 class ChapterPage extends StatefulWidget {
   final String fileName;
@@ -279,10 +252,10 @@ class _ChapterPageState extends State<ChapterPage> {
     _content = widget.content;
     _livro = widget.livro;
     _grade = widget.grade;
-    loadComments();
+    _loadComments();
   }
 
-  Future<void> loadComments() async {
+  Future<void> _loadComments() async {
     Directory directory = await getApplicationDocumentsDirectory();
     File file = File('${directory.path}/comments.json');
 
@@ -335,7 +308,7 @@ class _ChapterPageState extends State<ChapterPage> {
     allComments.add(commentMap);
     await file.writeAsString(json.encode(allComments));
 
-    loadComments();
+    _loadComments();
   }
 
   void _deleteComment(int index) async {
@@ -351,7 +324,7 @@ class _ChapterPageState extends State<ChapterPage> {
     allComments.removeAt(index);
     await file.writeAsString(json.encode(allComments));
 
-    loadComments();
+    _loadComments();
   }
 
   void _loadChapterText(int chapter) async {
@@ -365,9 +338,8 @@ class _ChapterPageState extends State<ChapterPage> {
       _grade = chapter;
     });
 
-    loadComments();
+    _loadComments();
 
-    // Scroll to top
     _scrollController.animateTo(
       0.0,
       duration: Duration(milliseconds: 500),
@@ -465,7 +437,7 @@ class _ChapterPageState extends State<ChapterPage> {
                     color: Colors.grey.withOpacity(0.5),
                     spreadRadius: 2,
                     blurRadius: 5,
-                    offset: Offset(0, 2), // changes position of shadow
+                    offset: Offset(0, 2),
                   ),
                 ],
               ),
@@ -497,7 +469,7 @@ class _ChapterPageState extends State<ChapterPage> {
                           color: Colors.grey.withOpacity(0.5),
                           spreadRadius: 2,
                           blurRadius: 5,
-                          offset: Offset(0, 2), // changes position of shadow
+                          offset: Offset(0, 2),
                         ),
                       ],
                     ),
@@ -534,8 +506,4 @@ extension StringExtension on String {
     return '${this[0].toUpperCase()}${this.substring(1)}';
   }
 }
-void main() {
-  runApp(MaterialApp(
-    home: BibliaPage(),
-  ));
-}
+

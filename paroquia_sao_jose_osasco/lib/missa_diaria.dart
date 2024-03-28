@@ -23,7 +23,22 @@ class _MissaDiariaPageState extends State<MissaDiariaPage> {
   void initState() {
     super.initState();
     _selectedDate = DateTime.now();
-    _fetchAndSaveMissaDiariaContent(_selectedDate);
+    _loadCachedContent(_selectedDate);
+  }
+
+  Future<void> _loadCachedContent(DateTime date) async {
+    try {
+      final content = await _readContentFromFile(date);
+      if (content != null) {
+        setState(() {
+          _missaDiariaContent = content;
+        });
+      } else {
+        await _fetchAndSaveMissaDiariaContent(date);
+      }
+    } catch (e) {
+      print('Erro ao carregar conteúdo do cache: $e');
+    }
   }
 
   Future<void> _fetchAndSaveMissaDiariaContent(DateTime date) async {
@@ -39,7 +54,7 @@ class _MissaDiariaPageState extends State<MissaDiariaPage> {
           setState(() {
             _missaDiariaContent = _processContent(content);
           });
-          await _saveContentToFile(_missaDiariaContent);
+          await _saveContentToFile(_missaDiariaContent, date);
         } else {
           setState(() {
             _missaDiariaContent = 'Conteúdo não encontrado.';
@@ -56,7 +71,8 @@ class _MissaDiariaPageState extends State<MissaDiariaPage> {
       });
     }
   }
-  Future<void> _saveContentToFile(String content) async {
+
+  Future<void> _saveContentToFile(String content, DateTime date) async {
     try {
       final directory = await getApplicationDocumentsDirectory();
       final dirPath = '${directory.path}/assets';
@@ -64,11 +80,24 @@ class _MissaDiariaPageState extends State<MissaDiariaPage> {
       if (!dir.existsSync()) {
         dir.createSync(recursive: true);
       }
-      final file = File('$dirPath/liturgia_diaria.txt');
+      final file = File('$dirPath/${_formatDate(date)}.txt');
       await file.writeAsString(content);
     } catch (e) {
       print('Erro ao salvar o arquivo: $e');
     }
+  }
+
+  Future<String?> _readContentFromFile(DateTime date) async {
+    try {
+      final directory = await getApplicationDocumentsDirectory();
+      final file = File('${directory.path}/assets/${_formatDate(date)}.txt');
+      if (file.existsSync()) {
+        return await file.readAsString();
+      }
+    } catch (e) {
+      print('Erro ao ler o arquivo: $e');
+    }
+    return null;
   }
 
   String? _extractTextBetweenSequences(
@@ -83,6 +112,7 @@ class _MissaDiariaPageState extends State<MissaDiariaPage> {
       return null;
     }
   }
+
   String _processContent(String content) {
     final separators = const ['Primeira Leitura', 'Segunda Leitura', 'Evangelho do Dia'];
     String processedContent = content;
@@ -114,7 +144,6 @@ class _MissaDiariaPageState extends State<MissaDiariaPage> {
     return processedContent.trim();
   }
 
-
   void _increaseFontSize() {
     setState(() {
       _fontSize += 2.0;
@@ -143,7 +172,7 @@ class _MissaDiariaPageState extends State<MissaDiariaPage> {
                 setState(() {
                   _selectedDate = selectedDate;
                 });
-                await _fetchAndSaveMissaDiariaContent(_selectedDate);
+                await _loadCachedContent(_selectedDate);
               }
             },
           ),
@@ -206,6 +235,10 @@ class _MissaDiariaPageState extends State<MissaDiariaPage> {
 
   String _formatTwoDigits(int value) {
     return value.toString().padLeft(2, '0');
+  }
+
+  String _formatDate(DateTime date) {
+    return '${date.year}_${_formatTwoDigits(date.month)}_${_formatTwoDigits(date.day)}';
   }
 
   Future<DateTime?> _selectDate(BuildContext context) async {
