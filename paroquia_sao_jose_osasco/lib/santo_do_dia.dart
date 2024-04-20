@@ -143,7 +143,7 @@ class _SantoDoDiaPageState extends State<SantoDoDiaPage> {
                           ),
                           Text(
                             '${_selectedDate.day}/${_selectedDate.month}/${_selectedDate.year}',
-                            style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                            style: TextStyle(fontSize: 20,color: Colors.white, fontWeight: FontWeight.bold),
                           ),
                           IconButton(
                             icon: Icon(Icons.arrow_forward),

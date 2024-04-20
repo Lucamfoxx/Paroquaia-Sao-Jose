@@ -1,19 +1,31 @@
 import 'firebase_options.dart';
 import 'package:flutter/material.dart';
 import 'missa_diaria.dart';
-import 'salmos.dart';
 import 'biblia.dart';
 import 'santo_do_dia.dart';
 import 'oracoes.dart';
 import 'paroquias.dart';
-import 'proverbios.dart';
 import 'noticias.dart';
-import 'salmo_layout.dart';
+import 'inscricoes.dart'; // Importe a página inscricoes.dart
 import 'package:firebase_core/firebase_core.dart';
-import 'horarios.dart'; // Importação da página horarios.dart
+import 'horarios.dart';
 import 'historiaparoquia.dart';
-import 'package:url_launcher/url_launcher.dart'; // Importação do url_launcher para abrir links
- // Importação da página historiaparoquia.dart
+import 'package:url_launcher/url_launcher.dart';
+import 'package:flutter/services.dart';
+import 'inscricoes_batismo.dart';
+import 'inscricoes_catequese.dart';
+import 'inscricoes_casamento.dart';
+import 'missas_intencoes.dart';
+import 'pedido_missas.dart';
+import 'pedido_intencoes.dart';
+import 'santo_padroeiro.dart';
+import 'sacramentos.dart';
+import 'inscricoes_catequese_jovem.dart';
+import 'inscricoes_catequese_infantil.dart';
+import 'dizimista.dart';
+import 'dizimosdoacoes.dart';
+import 'festas.dart';
+import 'preparacao.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -46,18 +58,29 @@ class MyApp extends StatelessWidget {
           },
         ),
         '/missa_diaria': (context) => MissaDiariaPage(),
-        '/salmos': (context) => SalmosPage(),
         '/biblia': (context) => BibliaPage(),
         '/santo_do_dia': (context) => SantoDoDiaPage(),
         '/oracoes': (context) => OracoesPage(),
         '/paroquias': (context) => ParoquiasPage(),
-        '/proverbios': (context) => ProverbiosPage(proverbioNumber: 1),
-        '/salmo_layout': (context) => SalmoPage(salmoNumber: 1),
-        for (int i = 1; i <= 150; i++)
-          '/salmo_$i': (context) => SalmoPage(salmoNumber: i),
         '/noticias': (context) => NoticiasPage(),
         '/horarios': (context) => HorariosPage(), // Rota para a página horarios.dart
-        '/historiaparoquia': (context) => HistoriaParoquiaPage(), // Rota para a página historiaparoquia.dart
+        '/historiaparoquia': (context) => HistoriaParoquiaPage(),
+        '/inscricoes': (context) => InscricoesPage(), // Rota para a página inscricoes.dart
+        '/inscricoes_catequese': (context) => InscricoesCatequesePage(),
+        '/inscricoes_catequese_infantil': (context) => CatequeseInfantilPage(),
+        '/inscricoes_catequese_jovem': (context) => CatequeseJovemPage(),
+        '/inscricoes_batismo': (context) => InscricoesBatismoPage(),
+        '/inscricoes_casamento': (context) => InscricoesCasamentoPage(),
+        '/missas_intencoes': (context) => MissasIntencoesPage(),
+        '/pedido_missas': (context) => PedidoMissasPage(),
+        '/pedido_intencoes': (context) => PedidoIntencoesPage(),
+        '/santo_padroeiro': (context) => SaoJosePage(),
+        '/sacramentos': (context) => SacramentosPage(),
+        '/dizimista': (context) => DizimistaPage(),
+        '/dizimosdoacoes': (context) => DoacoesPage(),
+        '/festas': (context) => FestasPage(),        
+        '/preparacaobatismo': (context) => PreparacaoPage(),
+// Rota para a página historiaparoquia.dart
       },
     );
   }
@@ -80,16 +103,20 @@ class MissaDiariaApp extends StatelessWidget {
               children: [
                 Image.asset('assets/logo.png'),
                 SizedBox(height: 20),
+                MenuButton('Inscrições', '/inscricoes'),
+                MenuButton('Missas e Intenções', '/missas_intencoes'),                
+                MenuButton('Dízimo e Doações', '/dizimosdoacoes'),
+                MenuButton('Festas', '/festas'),                
+                MenuButton('Santo Padroeiro', '/santo_padroeiro'),
+                MenuButton('Sacramentos', '/sacramentos'),
                 MenuButton('Liturgia Diária', '/missa_diaria'),
-                MenuButton('Salmos', '/salmos'),
                 MenuButton('Bíblia', '/biblia'),
                 MenuButton('Santo do Dia', '/santo_do_dia'),
                 MenuButton('Orações', '/oracoes'),
-                MenuButton('Dioceses', '/paroquias'),
-                MenuButton('Provérbios', '/proverbios'),
-                MenuButton('Notícias', '/noticias'),
+                MenuButton('Diocese', '/paroquias'),
+                MenuButton('Avisos Paroquiais', '/noticias'),
                 MenuButton('Horários', '/horarios'), // Botão para Horários
-                MenuButton('História da Paróquia', '/historiaparoquia'), // Botão para História da Paróquia
+                MenuButton('História da Paróquia', '/historiaparoquia'), /// Botão para História da Paróquia
                 SizedBox(height: 20), // Adiciona um espaço entre o menu e o texto com o endereço e telefone
                 ContactInfo(), // Adiciona o widget com as informações de contato
               ],
@@ -140,9 +167,39 @@ class ContactInfo extends StatelessWidget {
   Widget build(BuildContext context) {
     return Column(
       children: [
+        Image.asset(
+            'assets/sao_jose.jpg', // Caminho para a imagem logo2.png
+            fit: BoxFit.fill, // Preenche toda a área disponível
+          ),
+                  SizedBox(height: 20),
+          InkWell(
+            onTap: () {
+              launch("https://www.instagram.com/paroquiasaojoseosasco/");
+            },
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Image.asset(
+                  'assets/insta.png', // Caminho para o ícone do WhatsApp personalizado
+                  width: 25, // Largura do ícone
+                  height: 25, // Altura do ícone
+                  color: Color.fromARGB(255, 255, 255, 255), // Cor do ícone
+                ),
+                SizedBox(width: 5),
+                Text(
+                  "@paroquiasaojoseosasco",
+                  style: TextStyle(
+                    color: const Color.fromARGB(255, 255, 255, 255),
+                    decoration: TextDecoration.underline,
+                  ),
+                ),
+              ],
+            ),
+          ),
+          SizedBox(height: 20),
         InkWell(
           onTap: () {
-            launch("tel://1132912400"); // Abre o aplicativo de telefone com o número específico
+            launch("tel://+551136868961"); // Abre o aplicativo de telefone com o número específico
           },
           child: Row(
             mainAxisAlignment: MainAxisAlignment.center,
@@ -159,7 +216,31 @@ class ContactInfo extends StatelessWidget {
             ],
           ),
         ),
-        SizedBox(height: 10),
+                  SizedBox(height: 10),
+          InkWell(
+            onTap: () {
+              launch("https://wa.me/5511989369413");
+            },
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Image.asset(
+                  'assets/whatsapp1.png', // Caminho para o ícone do WhatsApp personalizado
+                  width: 36, // Largura do ícone
+                  height: 36, // Altura do ícone
+                  color: Colors.green, // Cor do ícone
+                ),
+                SizedBox(width: 5),
+                Text(
+                  "(11) 98936-9413",
+                  style: TextStyle(
+                    color: Colors.blue,
+                    decoration: TextDecoration.underline,
+                  ),
+                ),
+              ],
+            ),
+          ),        SizedBox(height: 20),
         InkWell(
           onTap: () {
             launch("https://maps.app.goo.gl/m9qhWyEBwzbJWFqf6"); // Abre o endereço no Google Maps
@@ -170,9 +251,9 @@ class ContactInfo extends StatelessWidget {
               Icon(Icons.location_on, color: const Color.fromARGB(255, 246, 251, 255)),
               SizedBox(width: 5),
               Text('''
-Paróquia São José
+Paróquia São José 
 Rua Francisco Haro Alaminos, 80 
-Vila São José – CEP: 06290-050 – Osasco / SP
+Vila São José Osasco / SP
 ''',
                 style: TextStyle(
                   color: const Color.fromARGB(255, 246, 251, 255),

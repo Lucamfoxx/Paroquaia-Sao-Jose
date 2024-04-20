@@ -29,7 +29,7 @@ class HistoriaParoquiaPage extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   _buildTitleWithImage(
-                    'Paróquia São José (Vila São José)',
+                    'Paróquia São José (Osasco)',
                     '''
 No início da década de 1950, foi doado para a Igreja o terreno de 1672 m² pelo Dr. Junqueira de Aquino, dono de uma gleba de terra em Osasco. A primeira missa realizada no terreno ocorreu por volta de 1952, celebrada pelo Pe. Domingos Tonini– CRL, pároco da Igreja dos Remédios. No dia 15 de agosto de 1954, ocorreu a bênção da primeira capela construída no terreno e dedicada a São José. Até o ano de 1967, a comunidade estava ligada a Paróquia N. Sra. dos Remédios. Foi quando chegaram os padres jesuítas americanos (Pe. Jack Vessels, primeiramente, Pe. Edgar e Pe. Eduardo Dougherty posteriormente) para atender os bairros da Vila São José, Jardim Mutinga e Vila Ayrosa.
 
@@ -41,82 +41,116 @@ Foi realizada a reforma da Igreja São Francisco de Assis (2004-2005), construç
 
 A Paróquia São José, celebra seu passado de esforços e conquistas, com vistas ao futuro, buscando continuar seu trabalho evangelizador nesta querida cidade, nutrindo a fé, a esperança e a caridade, celebrando os sacramentos que nos unem de maneira mais perfeita a Nosso Senhor e anunciando o Evangelho de Cristo, que dá verdadeira consciência e liberdade aos filhos de Deus.
 
- 
-
-Pe. Carlos Augusto Andrade 
 ''',
-                    'assets/imagens/imagemsj_1.jpg', // Caminho da imagem 1
+
+                    'assets/imagens/imagemsj_1.jpg',
+                    context,
                   ),
                 ],
               ),
             ),
             SizedBox(height: 20),
-            _buildImageSlider(), // Adiciona o slider de imagens abaixo das informações
+            _buildImageSlider(context), // Adiciona o slider de imagens abaixo das informações
           ],
         ),
       ),
     );
   }
 
-  Widget _buildTitleWithImage(String title, String text, String imagePath) {
+  Widget _buildTitleWithImage(
+      String title, String text, String imagePath, BuildContext context) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
           title,
-          style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold), // Ajuste o tamanho e a negrito do título
+          style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
         ),
         SizedBox(height: 10),
-        Image.asset(
-          imagePath,
-          width: double.infinity, // Expandir a imagem até as laterais da tela
-          fit: BoxFit.cover, // Ajustar a imagem para cobrir todo o espaço disponível
+        GestureDetector(
+          onTap: () {
+            _showImageDialog(context, imagePath);
+          },
+          child: ClipRRect(
+            borderRadius: BorderRadius.circular(20.0),
+            child: Image.asset(
+              imagePath,
+              width: double.infinity,
+              fit: BoxFit.cover,
+            ),
+          ),
         ),
         SizedBox(height: 10),
         Text(
           text,
-          style: TextStyle(fontSize: 16),
+          style: TextStyle(fontSize: 18),
           textAlign: TextAlign.left,
         ),
       ],
     );
   }
 
-  Widget _buildImageSlider() {
+  Widget _buildImageSlider(BuildContext context) {
     return Container(
       height: 200,
       child: ListView(
         scrollDirection: Axis.horizontal,
         children: [
-          _buildImageItem('assets/imagens/imagemsj_1.jpg'),
-          _buildImageItem('assets/imagens/imagemsj_2.jpg'),
-          _buildImageItem('assets/imagens/imagemsj_3.jpg'),
-          _buildImageItem('assets/imagens/imagemsj_4.jpg'),
-          _buildImageItem('assets/imagens/imagemsj_5.jpg'),
-          _buildImageItem('assets/imagens/imagemsj_6.jpg'),
-          _buildImageItem('assets/imagens/imagemsj_7.jpg'),
-          _buildImageItem('assets/imagens/imagemsj_8.jpg'),
-          _buildImageItem('assets/imagens/imagemsj_9.jpg'),
-          _buildImageItem('assets/imagens/imagemsj_10.jpg'),
-          _buildImageItem('assets/imagens/imagemsj_11.jpg'),
+          _buildImageItem('assets/imagens/imagemsj_1.jpg', context),
+          _buildImageItem('assets/imagens/imagemsj_2.jpg', context),
+          _buildImageItem('assets/imagens/imagemsj_3.jpg', context),
+          _buildImageItem('assets/imagens/imagemsj_4.jpg', context),
+          _buildImageItem('assets/imagens/imagemsj_5.jpg', context),
+          _buildImageItem('assets/imagens/imagemsj_6.jpg', context),
+          _buildImageItem('assets/imagens/imagemsj_7.jpg', context),
+          _buildImageItem('assets/imagens/imagemsj_8.jpg', context),
+          _buildImageItem('assets/imagens/imagemsj_9.jpg', context),
+          _buildImageItem('assets/imagens/imagemsj_10.jpg', context),
+          _buildImageItem('assets/imagens/imagemsj_11.jpg', context),
+          _buildImageItem('assets/imagens/imagemsj_12.jpg', context),
         ],
       ),
     );
   }
 
-  Widget _buildImageItem(String imagePath) {
+  Widget _buildImageItem(String imagePath, BuildContext context) {
     return Padding(
       padding: EdgeInsets.all(8.0),
-      child: ClipRRect(
-        borderRadius: BorderRadius.circular(20.0), // Cantos arredondados
-        child: Image.asset(
-          imagePath,
-          width: 300,
-          height: 200,
-          fit: BoxFit.cover, // Ajustar a imagem para cobrir todo o espaço disponível
+      child: GestureDetector(
+        onTap: () {
+          _showImageDialog(context, imagePath);
+        },
+        child: ClipRRect(
+          borderRadius: BorderRadius.circular(20.0),
+          child: Image.asset(
+            imagePath,
+            width: 300,
+            height: 200,
+            fit: BoxFit.cover,
+          ),
         ),
       ),
     );
   }
-}
 
+  void _showImageDialog(BuildContext context, String imagePath) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return Dialog(
+          child: Container(
+            width: MediaQuery.of(context).size.width * 0.8,
+            height: MediaQuery.of(context).size.height * 0.8,
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(20.0),
+            ),
+            child: Image.asset(
+              imagePath,
+              fit: BoxFit.contain,
+            ),
+          ),
+        );
+      },
+    );
+  }
+}

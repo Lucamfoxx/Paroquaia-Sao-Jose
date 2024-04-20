@@ -15,15 +15,23 @@ class MissaDiariaPage extends StatefulWidget {
 }
 
 class _MissaDiariaPageState extends State<MissaDiariaPage> {
-  String _missaDiariaContent = 'Carregando...'; // Inicialização aqui
+  List<String> _missaDiariaParts = ['Carregando...'];
   double _fontSize = 16.0;
   late DateTime _selectedDate;
+  late ScrollController _scrollController;
 
   @override
   void initState() {
     super.initState();
     _selectedDate = DateTime.now();
     _loadCachedContent(_selectedDate);
+    _scrollController = ScrollController();
+  }
+
+  @override
+  void dispose() {
+    _scrollController.dispose();
+    super.dispose();
   }
 
   Future<void> _loadCachedContent(DateTime date) async {
@@ -31,7 +39,7 @@ class _MissaDiariaPageState extends State<MissaDiariaPage> {
       final content = await _readContentFromFile(date);
       if (content != null) {
         setState(() {
-          _missaDiariaContent = content;
+          _missaDiariaParts = _processContent(content);
         });
       } else {
         await _fetchAndSaveMissaDiariaContent(date);
@@ -52,22 +60,22 @@ class _MissaDiariaPageState extends State<MissaDiariaPage> {
             document.body, 'Leitura do Dia', 'Palavras do Santo Padre');
         if (content != null) {
           setState(() {
-            _missaDiariaContent = _processContent(content);
+            _missaDiariaParts = _processContent(content);
           });
-          await _saveContentToFile(_missaDiariaContent, date);
+          await _saveContentToFile(content, date);
         } else {
           setState(() {
-            _missaDiariaContent = 'Conteúdo não encontrado.';
+            _missaDiariaParts = ['Conteúdo não encontrado.'];
           });
         }
       } else {
         setState(() {
-          _missaDiariaContent = 'Falha ao carregar o conteúdo.';
+          _missaDiariaParts = ['Falha ao carregar o conteúdo.'];
         });
       }
     } catch (e) {
       setState(() {
-        _missaDiariaContent = 'Erro: $e';
+        _missaDiariaParts = ['Erro: $e'];
       });
     }
   }
@@ -113,35 +121,18 @@ class _MissaDiariaPageState extends State<MissaDiariaPage> {
     }
   }
 
-  String _processContent(String content) {
+  List<String> _processContent(String content) {
     final separators = const ['Primeira Leitura', 'Segunda Leitura', 'Evangelho do Dia'];
-    String processedContent = content;
-    final lines = processedContent.split('\n');
-    bool previousLineHadNumber = false;
-    for (int i = 2; i < lines.length; i++) {
-      final currentLine = lines[i];
-      if (currentLine.trim().isNotEmpty) {
-        final trimmedLine = currentLine.trimLeft();
-        if (RegExp(r'\d').hasMatch(trimmedLine)) {
-          // Adiciona uma linha vazia após linhas com números
-          lines.insert(i + 1, '');
-          previousLineHadNumber = true;
-        } else if (trimmedLine.contains('.') && !trimmedLine.contains(RegExp(r'\d'))) {
-          // Verifica se a linha contém um ponto e não contém números
-          // Adiciona uma linha vazia após o ponto
-          lines[i] += '\n';
-        }
-      }
-      if (currentLine.trim().isNotEmpty && currentLine.startsWith(' ')) {
-        // Remove espaços extras no início de linhas com texto
-        lines[i] = currentLine.trimLeft();
-      }
+    List<String> parts = [];
+    if (content.contains('Segunda Leitura')) {
+      parts.add(content.split('Segunda Leitura')[0].trim());
+      parts.add(content.split('Evangelho do Dia')[0].split('Segunda Leitura')[1].trim());
+      parts.add(content.split('Evangelho do Dia')[1].trim());
+    } else {
+      parts.add(content.split('Evangelho do Dia')[0].trim());
+      parts.add(content.split('Evangelho do Dia')[1].trim());
     }
-    processedContent = lines.join('\n');
-
-    processedContent = processedContent.replaceAllMapped(
-        RegExp(separators.join('|')), (match) => '\u2022 \u200B${match.group(0)}\n\n');
-    return processedContent.trim();
+    return parts;
   }
 
   void _increaseFontSize() {
@@ -187,6 +178,7 @@ class _MissaDiariaPageState extends State<MissaDiariaPage> {
         ],
       ),
       body: SingleChildScrollView(
+        controller: _scrollController,
         child: Center(
           child: Padding(
             padding: const EdgeInsets.all(16.0),
@@ -215,14 +207,44 @@ class _MissaDiariaPageState extends State<MissaDiariaPage> {
                     ),
                   ),
                   const SizedBox(height: 20.0),
-                  Text(
-                    _missaDiariaContent,
-                    textAlign: TextAlign.left,
-                    style: TextStyle(
-                      fontSize: _fontSize,
-                      color: Colors.black,
-                      fontWeight: FontWeight.normal,
-                    ),
+                  ListView.builder(
+                    shrinkWrap: true,
+                    physics: NeverScrollableScrollPhysics(),
+                    itemCount: _missaDiariaParts.length,
+                    itemBuilder: (BuildContext context, int index) {
+                      String buttonText;
+                      if (_missaDiariaParts.length == 3) {
+                        if (index == 0) {
+                          buttonText = 'Primeira Leitura';
+                        } else if (index == 1) {
+                          buttonText = 'Segunda Leitura';
+                        } else {
+                          buttonText = 'Evangelho';
+                        }
+                      } else {
+                        if (index == 0) {
+                          buttonText = 'Primeira Leitura';
+                        } else {
+                          buttonText = 'Evangelho';
+                        }
+                      }
+                      return ExpansionTile(
+                        title: Text(buttonText),
+                        children: [
+                          Padding(
+                            padding: const EdgeInsets.all(8.0),
+                            child: Text(
+                              _missaDiariaParts[index],
+                              style: TextStyle(
+                                fontSize: _fontSize,
+                                color: Colors.black,
+                                fontWeight: FontWeight.normal,
+                              ),
+                            ),
+                          ),
+                        ],
+                      );
+                    },
                   ),
                 ],
               ),
