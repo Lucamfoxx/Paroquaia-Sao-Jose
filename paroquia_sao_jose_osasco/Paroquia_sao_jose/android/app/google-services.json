@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "1049373535668",
+    "project_id": "saojosea",
+    "storage_bucket": "saojosea.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1049373535668:android:b582cd748110087ee256e1",
+        "android_client_info": {
+          "package_name": "com.jose.paroquia_sao_jose_osasco"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDyCgifjwFXGaZyZHdtas6mQgtBy3BQMHc"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

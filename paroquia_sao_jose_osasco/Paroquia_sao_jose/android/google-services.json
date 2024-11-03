@@ -1,0 +1,30 @@
+{
+  "project_info": {
+    "project_number": "570436647717",
+    "firebase_url": "https://paroquia-sao-jose-osasco-default-rtdb.firebaseio.com",
+    "project_id": "paroquia-sao-jose-osasco",
+    "storage_bucket": "paroquia-sao-jose-osasco.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:570436647717:android:bbcf3d32289dfe1df578cc",
+        "android_client_info": {
+          "package_name": "com.jose.paroquia_sao_jose_osasco"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAUduZDQmbTVRwRqFFOgkEGPF1afUc7ZQ4"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

@@ -1,0 +1,48 @@
+name: Paroquia_sao_jose
+description: "A new Flutter project."
+publish_to: 'none' 
+
+
+version: 1.0.0+5
+environment:
+  sdk: '>=2.19.0 <4.0.0'
+
+dependencies:
+  flutter:
+    sdk: flutter
+  flutter_localizations:
+    sdk: flutter
+  http: ^1.2.0
+  html: ^0.15.0
+  path_provider: ^2.0.5
+  path_provider_foundation: ^2.4.0
+  firebase_core: ^3.2.0
+  firebase_database: ^11.0.3
+  intl: ^0.19.0
+  url_launcher: ^6.0.12
+  image_picker: ^1.1.2
+  image_picker_ios: ^0.8.12
+  mailer: ^6.1.1
+  file_picker: ^8.0.6
+  file_icon: ^1.0.0
+  permission_handler: ^11.3.1 
+  flutter_dotenv: ^5.0.2
+  table_calendar: ^3.0.0
+
+  
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^4.0.0
+
+flutter:
+  uses-material-design: true
+  assets:
+    - assets/santo_dia/jpg/
+    - assets/
+    - assets/biblia/Testamentos/
+    - assets/santo_dia/txt/
+    - assets/mapas/
+    - assets/oracao/
+    - assets/imagens/
+    - assets/config/.env

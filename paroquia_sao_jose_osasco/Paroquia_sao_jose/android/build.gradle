@@ -1,0 +1,37 @@
+buildscript {
+    ext.kotlin_version = '1.9.10' // Define a versão do Kotlin para evitar incompatibilidade
+    repositories {
+        google()
+        mavenCentral()
+    }
+    dependencies {
+        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
+        classpath 'com.android.tools.build:gradle:7.0.4' // Atualize conforme necessário
+    }
+}
+
+// Configuração global de repositórios para todos os projetos
+allprojects {
+    repositories {
+        google()
+        mavenCentral()
+    }
+}
+
+// Define o diretório de build do projeto raiz
+rootProject.buildDir = '../build'
+
+// Define o diretório de build para subprojetos com base no diretório do projeto raiz
+subprojects {
+    project.buildDir = "${rootProject.buildDir}/${project.name}"
+}
+
+// Garante que o subprojeto `app` seja avaliado antes dos demais subprojetos
+subprojects {
+    project.evaluationDependsOn(':app')
+}
+
+// Tarefa para limpar o diretório de build do projeto raiz
+tasks.register("clean", Delete) {
+    delete rootProject.buildDir
+}
