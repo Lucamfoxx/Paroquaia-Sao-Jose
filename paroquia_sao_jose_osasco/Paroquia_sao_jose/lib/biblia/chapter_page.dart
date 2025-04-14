@@ -4,219 +4,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart' show rootBundle;
 import 'package:path_provider/path_provider.dart';
-
-void main() {
-  runApp(MaterialApp(
-    home: BibliaPage(),
-  ));
-}
-
-class BibliaPage extends StatefulWidget {
-  @override
-  _BibliaPageState createState() => _BibliaPageState();
-}
-
-class _BibliaPageState extends State<BibliaPage> {
-  late bool _velhoTestamentoExpanded;
-  late bool _novoTestamentoExpanded;
-  late Map<String, int> limitesGrade;
-  late Map<String, String> menuTitles;
-  late Map<String, int> limitesGradeNovo;
-  late Map<String, String> menuNovo;
-
-  @override
-  void initState() {
-    super.initState();
-    _velhoTestamentoExpanded = false;
-    _novoTestamentoExpanded = false;
-    _loadData();
-  }
-
-  Future<void> _loadData() async {
-    final limitesGradeJsonString = await rootBundle.loadString('assets/mapas/limites_grade.json');
-    final menuTitlesJsonString = await rootBundle.loadString('assets/mapas/menu_titles.json');
-    final limitesGradeNovoJsonString = await rootBundle.loadString('assets/mapas/limites_grade_novo.json');
-    final menuNovoJsonString = await rootBundle.loadString('assets/mapas/menu_novo.json');
-
-    setState(() {
-      limitesGrade = Map<String, int>.from(json.decode(limitesGradeJsonString));
-      menuTitles = Map<String, String>.from(json.decode(menuTitlesJsonString));
-      limitesGradeNovo = Map<String, int>.from(json.decode(limitesGradeNovoJsonString));
-      menuNovo = Map<String, String>.from(json.decode(menuNovoJsonString));
-    });
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text('Bíblia'),
-      ),
-      body: SingleChildScrollView(
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            Container(
-              margin: EdgeInsets.symmetric(vertical: 8.0, horizontal: 16.0),
-              decoration: BoxDecoration(
-                color: Color.fromARGB(255, 148, 203, 252),
-                borderRadius: BorderRadius.circular(10.0),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.grey.withOpacity(0.5),
-                    spreadRadius: 2,
-                    blurRadius: 5,
-                    offset: Offset(0, 2),
-                  ),
-                ],
-              ),
-              child: InkWell(
-                onTap: () {
-                  setState(() {
-                    _velhoTestamentoExpanded = !_velhoTestamentoExpanded;
-                    _novoTestamentoExpanded = false;
-                  });
-                },
-                child: Padding(
-                  padding: const EdgeInsets.all(12.0),
-                  child: Text(
-                    'Velho Testamento',
-                    style: TextStyle(fontSize: 16.0, fontWeight: FontWeight.bold),
-                  ),
-                ),
-              ),
-            ),
-            if (_velhoTestamentoExpanded)
-              Column(
-                children: limitesGrade.keys.map((livro) {
-                  return _buildBookItem(livro, limitesGrade, menuTitles);
-                }).toList(),
-              ),
-            Container(
-              margin: EdgeInsets.symmetric(vertical: 8.0, horizontal: 16.0),
-              decoration: BoxDecoration(
-                color: Color.fromARGB(255, 148, 203, 252),
-                borderRadius: BorderRadius.circular(10.0),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.grey.withOpacity(0.5),
-                    spreadRadius: 2,
-                    blurRadius: 5,
-                    offset: Offset(0, 2),
-                  ),
-                ],
-              ),
-              child: InkWell(
-                onTap: () {
-                  setState(() {
-                    _novoTestamentoExpanded = !_novoTestamentoExpanded;
-                    _velhoTestamentoExpanded = false;
-                  });
-                },
-                child: Padding(
-                  padding: const EdgeInsets.all(12.0),
-                  child: Text(
-                    'Novo Testamento',
-                    style: TextStyle(fontSize: 16.0, fontWeight: FontWeight.bold),
-                  ),
-                ),
-              ),
-            ),
-            if (_novoTestamentoExpanded)
-              Column(
-                children: limitesGradeNovo.keys.map((livro) {
-                  return _buildBookItem(livro, limitesGradeNovo, menuNovo);
-                }).toList(),
-              ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildBookItem(String livro, Map<String, int> limites, Map<String, String> menu) {
-    return Container(
-      margin: EdgeInsets.symmetric(vertical: 4.0, horizontal: 8.0),
-      decoration: BoxDecoration(
-        color: Color.fromARGB(255, 202, 227, 249),
-        borderRadius: BorderRadius.circular(8.0),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.grey.withOpacity(0.5),
-            spreadRadius: 2,
-            blurRadius: 5,
-            offset: Offset(0, 2),
-          ),
-        ],
-      ),
-      child: ListTile(
-        title: Text(menu[livro] ?? livro.replaceAll('_', ' ').capitalize()),
-        onTap: () {
-          _openBook(livro, limites, menu);
-        },
-      ),
-    );
-  }
-
-  void _openBook(String livro, Map<String, int> limites, Map<String, String> menu) {
-    int limiteGrade = limites[livro] ?? 1;
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return Dialog(
-          child: Container(
-            width: double.infinity,
-            height: double.infinity,
-            padding: EdgeInsets.all(16.0),
-            child: GridView.builder(
-              gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                crossAxisCount: 5,
-                mainAxisSpacing: 5.0,
-                crossAxisSpacing: 5.0,
-                childAspectRatio: 1,
-              ),
-              itemCount: limiteGrade,
-              itemBuilder: (BuildContext context, int index) {
-                int grade = index + 1;
-                return GestureDetector(
-                  onTap: () {
-                    _openChapter(livro, grade);
-                  },
-                  child: Container(
-                    color: Color.fromARGB(255, 148, 203, 252),
-                    child: Center(
-                      child: Text(
-                        grade.toString(),
-                        style: TextStyle(
-                          color: const Color.fromARGB(255, 0, 0, 0),
-                          fontSize: 20.0,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                    ),
-                  ),
-                );
-              },
-            ),
-          ),
-        );
-      },
-    );
-  }
-
-  void _openChapter(String livro, int grade) async {
-    String fileName = 'assets/biblia/Testamentos/${livro}_${grade}.txt';
-    String content = await rootBundle.loadString(fileName);
-    String livroCapitulo = "${menuTitles[livro] ?? livro.replaceAll('_', ' ').capitalize()} $grade";
-
-    Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (context) => ChapterPage(fileName: livroCapitulo, content: content, livro: livro, grade: grade),
-      ),
-    );
-  }
-}
+import 'extensions.dart';
 
 class ChapterPage extends StatefulWidget {
   final String fileName;
@@ -245,6 +33,10 @@ class _ChapterPageState extends State<ChapterPage> {
   late int _grade;
   final _scrollController = ScrollController();
 
+  // Variáveis para status de lido e favorito
+  bool _isRead = false;
+  bool _isFavorite = false;
+
   @override
   void initState() {
     super.initState();
@@ -253,6 +45,7 @@ class _ChapterPageState extends State<ChapterPage> {
     _livro = widget.livro;
     _grade = widget.grade;
     _loadComments();
+    _loadStatus();
   }
 
   Future<void> _loadComments() async {
@@ -262,9 +55,32 @@ class _ChapterPageState extends State<ChapterPage> {
     if (await file.exists()) {
       List<dynamic> allComments = json.decode(await file.readAsString());
       setState(() {
-        comments = allComments.where((comment) => comment['livro'] == _livro && comment['grade'] == _grade).toList();
+        comments = allComments
+            .where((comment) =>
+                comment['livro'] == _livro && comment['grade'] == _grade)
+            .toList();
       });
     }
+  }
+
+  Future<void> _loadStatus() async {
+    Directory directory = await getApplicationDocumentsDirectory();
+    File readFile = File('${directory.path}/read_chapters.json');
+    File favFile = File('${directory.path}/favorites.json');
+    List<dynamic> readChapters = [];
+    List<dynamic> favorites = [];
+    if (await readFile.exists()) {
+      readChapters = json.decode(await readFile.readAsString());
+    }
+    if (await favFile.exists()) {
+      favorites = json.decode(await favFile.readAsString());
+    }
+    setState(() {
+      _isRead = readChapters
+          .any((item) => item['livro'] == _livro && item['grade'] == _grade);
+      _isFavorite = favorites
+          .any((item) => item['livro'] == _livro && item['grade'] == _grade);
+    });
   }
 
   void _increaseFontSize() {
@@ -355,6 +171,44 @@ class _ChapterPageState extends State<ChapterPage> {
     );
   }
 
+  Future<void> _toggleReadStatus() async {
+    Directory directory = await getApplicationDocumentsDirectory();
+    File readFile = File('${directory.path}/read_chapters.json');
+    List<dynamic> readChapters = [];
+    if (await readFile.exists()) {
+      readChapters = json.decode(await readFile.readAsString());
+    }
+    if (_isRead) {
+      readChapters.removeWhere(
+          (item) => item['livro'] == _livro && item['grade'] == _grade);
+    } else {
+      readChapters.add({'livro': _livro, 'grade': _grade});
+    }
+    await readFile.writeAsString(json.encode(readChapters));
+    setState(() {
+      _isRead = !_isRead;
+    });
+  }
+
+  Future<void> _toggleFavoriteStatus() async {
+    Directory directory = await getApplicationDocumentsDirectory();
+    File favFile = File('${directory.path}/favorites.json');
+    List<dynamic> favorites = [];
+    if (await favFile.exists()) {
+      favorites = json.decode(await favFile.readAsString());
+    }
+    if (_isFavorite) {
+      favorites.removeWhere(
+          (item) => item['livro'] == _livro && item['grade'] == _grade);
+    } else {
+      favorites.add({'livro': _livro, 'grade': _grade});
+    }
+    await favFile.writeAsString(json.encode(favorites));
+    setState(() {
+      _isFavorite = !_isFavorite;
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -362,19 +216,31 @@ class _ChapterPageState extends State<ChapterPage> {
         title: Text(_fileName),
         actions: [
           IconButton(
+            icon: Icon(Icons.arrow_back),
+            onPressed: _grade > 1
+                ? () {
+                    _loadChapterText(_grade - 1);
+                    _scrollToTop();
+                  }
+                : null,
+          ),
+          IconButton(
+            icon: _isRead
+                ? Icon(Icons.check_box)
+                : Icon(Icons.check_box_outline_blank),
+            onPressed: _toggleReadStatus,
+          ),
+          IconButton(
+            icon: _isFavorite ? Icon(Icons.star) : Icon(Icons.star_border),
+            onPressed: _toggleFavoriteStatus,
+          ),
+          IconButton(
             icon: Icon(Icons.zoom_in),
             onPressed: _increaseFontSize,
           ),
           IconButton(
             icon: Icon(Icons.zoom_out),
             onPressed: _decreaseFontSize,
-          ),
-          IconButton(
-            icon: Icon(Icons.arrow_back),
-            onPressed: _grade > 1 ? () {
-              _loadChapterText(_grade - 1);
-              _scrollToTop();
-            } : null,
           ),
           IconButton(
             icon: Icon(Icons.arrow_forward),
@@ -397,7 +263,8 @@ class _ChapterPageState extends State<ChapterPage> {
                       onChanged: (value) {
                         comentario = value;
                       },
-                      decoration: InputDecoration(hintText: 'Digite seu comentário'),
+                      decoration:
+                          InputDecoration(hintText: 'Digite seu comentário'),
                     ),
                     actions: <Widget>[
                       TextButton(
@@ -500,10 +367,3 @@ class _ChapterPageState extends State<ChapterPage> {
     );
   }
 }
-
-extension StringExtension on String {
-  String capitalize() {
-    return '${this[0].toUpperCase()}${this.substring(1)}';
-  }
-}
-

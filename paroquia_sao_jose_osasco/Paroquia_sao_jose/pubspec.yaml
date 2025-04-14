@@ -1,6 +1,6 @@
 name: Paroquia_sao_jose
 description: "A new Flutter project."
-publish_to: 'none' 
+publish_to: 'none'
 
 
 version: 1.0.0+5
@@ -25,11 +25,13 @@ dependencies:
   mailer: ^6.1.1
   file_picker: ^8.0.6
   file_icon: ^1.0.0
-  permission_handler: ^11.3.1 
+  permission_handler: ^11.3.1
   flutter_dotenv: ^5.0.2
   table_calendar: ^3.0.0
+  shared_preferences: ^2.0.0
+  google_fonts: ^6.1.0
 
-  
+
 dev_dependencies:
   flutter_test:
     sdk: flutter
