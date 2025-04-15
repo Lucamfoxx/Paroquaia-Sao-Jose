@@ -37,19 +37,21 @@ class _SantoDoDiaPageState extends State<SantoDoDiaPage> {
       String formattedDate =
           "${selectedDate.day.toString().padLeft(2, '0')}_${selectedDate.month.toString().padLeft(2, '0')}";
 
-      String santoDoDiaText =
-          await rootBundle.loadString('assets/santo_dia/txt/$formattedDate.txt');
+      String santoDoDiaText = await rootBundle
+          .loadString('assets/santo_dia/txt/$formattedDate.txt');
 
       Image? santoDoDiaImage;
       bool imageExists = await rootBundle
-          .load('assets/santo_dia/jpg/$formattedDate.jpg')
+          .load('assets/santo_dia/jpg/$formattedDate.webp')
           .then((value) {
-        santoDoDiaImage = Image.asset('assets/santo_dia/jpg/$formattedDate.jpg');
+        santoDoDiaImage =
+            Image.asset('assets/santo_dia/jpg/$formattedDate.webp');
         return true;
       }).catchError((error) => false);
 
       setState(() {
-        _santoDoDia = SantoDoDia(text: santoDoDiaText, image: imageExists ? santoDoDiaImage : null);
+        _santoDoDia = SantoDoDia(
+            text: santoDoDiaText, image: imageExists ? santoDoDiaImage : null);
         _isLoading = false;
       });
     } catch (e) {
@@ -143,7 +145,10 @@ class _SantoDoDiaPageState extends State<SantoDoDiaPage> {
                           ),
                           Text(
                             '${_selectedDate.day}/${_selectedDate.month}/${_selectedDate.year}',
-                            style: TextStyle(fontSize: 20,color: Colors.white, fontWeight: FontWeight.bold),
+                            style: TextStyle(
+                                fontSize: 20,
+                                color: Colors.white,
+                                fontWeight: FontWeight.bold),
                           ),
                           IconButton(
                             icon: Icon(Icons.arrow_forward),

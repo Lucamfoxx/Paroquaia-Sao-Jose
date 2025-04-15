@@ -1,8 +1,5 @@
 plugins {
     id "com.android.application"
-    // START: FlutterFire Configuration
-    id 'com.google.gms.google-services'
-    // END: FlutterFire Configuration
     id "kotlin-android"
     id "dev.flutter.flutter-gradle-plugin"
 }
@@ -25,7 +22,8 @@ if (keystorePropertiesFile.exists()) {
 
 android {
     namespace "com.jose.paroquia_sao_jose_osasco"
-    compileSdkVersion 34 // Atualizado para Android 14 (API level 34)
+    compileSdkVersion 35 // Compilando contra Android SDK 35
+
     ndkVersion flutter.ndkVersion
 
     compileOptions {
@@ -43,8 +41,8 @@ android {
 
     defaultConfig {
         applicationId "com.jose.paroquia_sao_jose_osasco"
-        minSdkVersion 21 // MinSDKVersion definido para Android 5.0 (Lollipop)
-        targetSdkVersion 34 // Target Android 14 (API level 34)
+        minSdkVersion 21 // Android 5.0 (Lollipop)
+        targetSdkVersion 35 // Atualizado para Android SDK 35
         versionCode flutterVersionCode
         versionName flutterVersionName
         multiDexEnabled true
@@ -62,8 +60,8 @@ android {
     buildTypes {
         release {
             signingConfig signingConfigs.release
-            minifyEnabled false // Pode ser ajustado se estiver usando ProGuard
-            shrinkResources false // Pode habilitar se desejar reduzir o tamanho do APK
+            minifyEnabled false // Ajuste se estiver utilizando ProGuard
+            shrinkResources false // Habilite se desejar reduzir o tamanho do APK
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
     }

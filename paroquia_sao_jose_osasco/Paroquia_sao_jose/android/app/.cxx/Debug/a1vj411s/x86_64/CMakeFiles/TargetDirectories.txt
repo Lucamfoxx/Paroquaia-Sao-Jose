@@ -1,0 +1,2 @@
+D:/PROJETOS/C#/Paroquaia-Sao-Jose/paroquia_sao_jose_osasco/Paroquia_sao_jose/android/app/.cxx/Debug/a1vj411s/x86_64/CMakeFiles/edit_cache.dir
+D:/PROJETOS/C#/Paroquaia-Sao-Jose/paroquia_sao_jose_osasco/Paroquia_sao_jose/android/app/.cxx/Debug/a1vj411s/x86_64/CMakeFiles/rebuild_cache.dir

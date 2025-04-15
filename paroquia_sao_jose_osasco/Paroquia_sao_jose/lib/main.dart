@@ -204,7 +204,8 @@ class ContactInfo extends StatelessWidget {
         SizedBox(height: 20),
         InkWell(
           onTap: () {
-            launch("https://www.instagram.com/paroquiasaojoseosasco/");
+            launch(
+                "https://www.instagram.com/paroquiasjosasco?igsh=M3NpcG9jbW5jaHds");
           },
           child: Row(
             mainAxisAlignment: MainAxisAlignment.center,
